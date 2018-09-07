@@ -14,9 +14,10 @@ public class Launcher {
 	public static void main(String[] args) throws Exception {
 		collection = new CustomCollection<>();
 		addEmployees();
-		removeEmployees();
+		max();
+		min();
 		sort();
-		search();
+		filter();
 	}
 	
 	// test adding
@@ -25,7 +26,7 @@ public class Launcher {
 		collection.add(new Employee("Arseniy", 12500.50));
 		collection.add(new Employee("Yuriy", 25700.25));
 		collection.add(new Employee("Michael", 5900.60));
-		System.out.println(collection.getLast().getName());
+		iterate();
 	}
 	
 	// test removing
@@ -36,33 +37,48 @@ public class Launcher {
 	}
 	
 	//test max method
-	private static String max() {
-		return collection.maxValue(new EmployeeComparator()).getName();
+	private static void max() {
+		System.out.println("Maximum value of collection has : ");
+		System.out.println(collection.maxValue((e1 , e2) -> e1.getPayment().compareTo(e2.getPayment())).getName());
 	}
 	
 	//test min method
-	private static String min() {
-		return collection.minValue(new EmployeeComparator()).getName();
+	private static void min() {
+		System.out.println("Minimum value of collection has : ");
+		System.out.println(collection.minValue((e1 , e2) -> e1.getPayment().compareTo(e2.getPayment())).getName());
 	}
 	
 	//test sorting
 	private static void sort() {
-		
-		collection.sort(new EmployeeComparator());
-		
-		for(Iterator<Employee> iter = collection.iterator(); iter.hasNext();) {
-	         Employee employee = iter.next();
-	         System.out.println("Name : " + employee.getName());
-	    } 
+		System.out.println("Sorting collection...");
+		collection.sort((e1 , e2) -> e1.getName().compareTo(e2.getName()));
+		iterate();
 	}
 	
 	//test searching 
-	private static void search() {
-		System.out.println("Search Yuriy...");
-		System.out.println(collection.search(new Employee("Yuriy", 0.0)).getPayment());
-		System.out.println("-----------------------------");
-		System.out.println("Search George...");
-		//TODO throws NullPointerException because inserted element doesn't exist in collection
-		System.out.println(collection.search(new Employee("George", 0.0)).getPayment());
+	private static void filter() {
+		CustomCollection<Employee> customCollection = collection.filter(new ISelector<Employee>() {
+			@Override
+			public <Double> Double select(Employee data) {
+				return (Double) data.getPayment();
+			}
+		} , new Employee("Lisa", 12500.50));
+		System.out.println("Filtered collection : ");
+		for (Iterator<Employee> iterator = customCollection.iterator() ; iterator.hasNext() ;) {
+			Employee employee = iterator.next();
+			System.out.println("Name : " + employee.getName());
+			System.out.println("Payment " + employee.getPayment());
+		}
+	}
+	
+	//test iterating
+	private static void iterate() {
+		System.out.println("Collection of : ");
+		for (Iterator<Employee> iterator = collection.iterator() ; iterator.hasNext() ;) {
+			Employee employee = iterator.next();
+			System.out.println("Name : " + employee.getName());
+			System.out.println("Payment " + employee.getPayment());
+		}
 	}
 }
+
