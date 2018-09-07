@@ -1,18 +1,33 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 public class CustomCollection<TData> {
 
-	private ArrayList<TData> list;
+	private List<TData> list;
 	private int size;
 	
+	//create collection without size and null elements
 	public CustomCollection() {
 		list = new ArrayList<>();
+		size = list.size();
+	}
+	
+	//create collection with required size
+	public CustomCollection(int size) {
+		list = new ArrayList<>(size);
+		this.size = size;
+	}
+	
+	//create collection with inserted elements
+	public CustomCollection(TData [] data) {
+		list = Arrays.asList(data);
 		size = list.size();
 	}
 	
@@ -40,55 +55,27 @@ public class CustomCollection<TData> {
 	}
 	
 	public TData getFirst() {
-		if (size == 0) {
-			return null;
-		}
-		else {
-			return list.get(0);
-		}
+		return size == 0 ? null : list.get(0);
 	}
 	
 	public TData getLast() {
-		if (size == 0) {
-			return null;
-		}
-		else {
-			return list.get(size - 1);
-		}
+		return size == 0 ? null : list.get(size - 1);
 	}
 
-	//TODO input your custom class that implement the interface Comparator
-	//TODO method compare() must return the value 1 , -1 , 0
+	//TODO input your custom class that implements the interface Comparator
 	public TData maxValue(Comparator<TData> comparator) {
 		TData maxValue = list.get(0);
 		for (int i = 0 ; i < size ; i++) {
-			switch (comparator.compare(maxValue , list.get(i))) {
-				case 1 :
-					break;
-				case -1 :
-					maxValue = list.get(i);
-					break;
-				case 0 :
-					break;
-			}
+			if(comparator.compare(maxValue , list.get(i)) < 0) maxValue = list.get(i);
 		}
 		return maxValue;
 	}
 	
-	//TODO input your custom class that implement the interface Comparator
-	//TODO method compare() must return the value 1 , -1 , 0
+	//TODO input your custom class that implements the interface Comparator
 	public TData minValue(Comparator<TData> comparator) {
 		TData minValue = list.get(0);
 		for (int i = 0 ; i < size ; i++) {
-			switch (comparator.compare(minValue , list.get(i))) {
-				case 1 :
-					minValue = list.get(i);
-					break;
-				case -1 :
-					break;
-				case 0 :
-					break;
-			}
+			if(comparator.compare(minValue , list.get(i)) > 0) minValue = list.get(i);
 		}
 		return minValue;
 	}
@@ -96,18 +83,13 @@ public class CustomCollection<TData> {
 	//TODO if comparable return 1 -> exist
 	//TODO if comparable return -1 -> not exist
 	//TODO input your custom class that implement the interface Comparable
-	public TData search(Comparable<TData> comparable) {
-		TData data = null;
+	public CustomCollection<TData> filter(ISelector<TData> selector , TData data) {
+		CustomCollection<TData> collection = new CustomCollection<>();
+		collection.add(data);
 		for (int i = 0 ; i < size ; i++) {
-			switch (comparable.compareTo(list.get(i))) {
-				case 1 : 
-					data = list.get(i);
-					break;
-				case -1 :
-					break;
-			}
+			if (selector.select(data).equals(selector.select(list.get(i)))) collection.add(list.get(i));
 		}
-		return data;
+		return collection;
 	}
 	
 	//TODO bubble sort method
@@ -116,20 +98,10 @@ public class CustomCollection<TData> {
 	public void sort(Comparator<TData> comparator) {
 		for (int i = 1 ; i < size ; i++) {
 			for (int j = size - 1 ; j >= 1 ; j--) {
-				
-				switch (comparator.compare(list.get(j-1) , list.get(j))) {
-					case 1 :
-						Collections.swap(list, j-1, j);
-						break;
-					case -1 :
-						break;
-					case 0 :
-						break;
-				}
-				
+				//decreasing sort!
+				if(comparator.compare(list.get(j-1) , list.get(j)) > 0) Collections.swap(list, j-1, j);
 			}
 		}
-		
 	}
 	
     public Iterator<TData> iterator() {
@@ -140,10 +112,7 @@ public class CustomCollection<TData> {
 		private int position = 0;
 	 
 		public boolean hasNext() {
-            if (position < size)
-                return true;
-            else
-                return false;
+            return position < size;
         }
  
         public TData next() {
