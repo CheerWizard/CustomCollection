@@ -26,8 +26,8 @@ public class CustomCollection<TData> {
 	}
 	
 	//create collection with inserted elements
-	public CustomCollection(TData [] data) {
-		list = Arrays.asList(data);
+	public CustomCollection(List<TData> list) {
+		this.list = list;
 		size = list.size();
 	}
 	
